@@ -8,6 +8,8 @@ Built with Laravel, HTMX, and Tailwind CSS. No JavaScript frameworks. No build c
 
 ![SQL Query Editor](screenshot2.png)
 
+![User Management](screenshot3.png)
+
 ## Features
 
 - **Server Dashboard** — Version, uptime, storage usage, and database overview at a glance
