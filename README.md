@@ -4,6 +4,10 @@ A fast, lightweight web UI for managing ClickHouse databases. Browse databases, 
 
 Built with Laravel, HTMX, and Tailwind CSS. No JavaScript frameworks. No build complexity. Just a fast admin panel that gets out of your way.
 
+![Table Data Browser](screenshot1.png)
+
+![SQL Query Editor](screenshot2.png)
+
 ## Features
 
 - **Server Dashboard** — Version, uptime, storage usage, and database overview at a glance
