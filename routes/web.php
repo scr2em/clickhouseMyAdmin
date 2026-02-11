@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\QueryController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -22,3 +24,8 @@ Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show')
 Route::post('/users/{user}/grant', [UserController::class, 'grant'])->name('users.grant');
 Route::post('/users/{user}/revoke', [UserController::class, 'revoke'])->name('users.revoke');
 Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+Route::post('/settings', [SettingsController::class, 'store'])->name('settings.store');
+
+Route::post('/ai/generate-sql', [AiController::class, 'generateSql'])->name('ai.generateSql');

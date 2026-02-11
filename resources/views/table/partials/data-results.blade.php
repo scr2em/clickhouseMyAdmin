@@ -62,7 +62,7 @@
                             <td class="px-3 py-2 text-sm font-mono text-gray-700 max-w-xs whitespace-nowrap group relative">
                                 @if($isJson)
                                     <div class="truncate cursor-pointer hover:text-blue-600"
-                                         onclick="openJsonModal({{ json_encode($col['name']) }}, {{ json_encode($display) }}{{ !$isCustomQuery ? ', ' . json_encode(json_encode($row)) : '' }})">
+                                         onclick="openJsonModal(this, {{ json_encode($col['name']) }}, {{ json_encode($display) }}{{ !$isCustomQuery ? ', ' . json_encode(json_encode($row)) : '' }})">
                                         {{ $display }}
                                     </div>
                                 @elseif(!$isCustomQuery)

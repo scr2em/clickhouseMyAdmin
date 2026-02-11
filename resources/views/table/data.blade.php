@@ -41,6 +41,11 @@
                         <a href="{{ route('table.data', [$database, $table]) }}"
                            class="px-3 py-1.5 text-sm font-medium rounded bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">Reset</a>
                     @endif
+                    <button type="button" onclick="openAiModal('{{ $database }}', '{{ $table }}')"
+                        class="px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded hover:bg-purple-700 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        AI Assist
+                    </button>
                     <button type="submit" class="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
                         Run Query
                     </button>
@@ -64,7 +69,7 @@
             </div>
             <div class="flex-1 overflow-auto p-4">
                 <textarea id="json-modal-editor"
-                    class="w-full h-64 font-mono text-sm border border-gray-300 rounded p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y bg-gray-50"></textarea>
+                    class="w-full font-mono text-sm border border-gray-300 rounded p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y bg-gray-50" style="min-height: 500px"></textarea>
                 <div id="json-modal-feedback" class="mt-2 text-sm hidden"></div>
             </div>
             <div class="px-4 py-3 border-t border-gray-200 flex justify-end gap-2">
@@ -114,7 +119,10 @@ function startInlineEdit(div, column, currentValue, rowJson) {
     input.focus();
     input.select();
 
+    let saving = false;
+
     function cancel() {
+        if (saving) return;
         div.innerHTML = '';
         div.textContent = originalText;
         div.classList.add('truncate');
@@ -124,6 +132,7 @@ function startInlineEdit(div, column, currentValue, rowJson) {
         const newValue = input.value;
         if (newValue === currentValue) { cancel(); return; }
 
+        saving = true;
         input.disabled = true;
         input.classList.add('opacity-50');
 
@@ -136,6 +145,7 @@ function startInlineEdit(div, column, currentValue, rowJson) {
                     div.classList.add('bg-green-50');
                     setTimeout(() => div.classList.remove('bg-green-50'), 1500);
                 } else {
+                    saving = false;
                     input.disabled = false;
                     input.classList.remove('opacity-50');
                     input.classList.add('border-red-500');
@@ -143,6 +153,7 @@ function startInlineEdit(div, column, currentValue, rowJson) {
                 }
             })
             .catch(() => {
+                saving = false;
                 input.disabled = false;
                 input.classList.remove('opacity-50');
                 input.classList.add('border-red-500');
@@ -161,12 +172,15 @@ function startInlineEdit(div, column, currentValue, rowJson) {
 
 // --- JSON modal ---
 
-function openJsonModal(column, value, rowJson) {
+let jsonModalSourceCell = null;
+
+function openJsonModal(sourceDiv, column, value, rowJson) {
     const modal = document.getElementById('json-modal');
     const editor = document.getElementById('json-modal-editor');
     const saveBtn = document.getElementById('json-modal-save');
     const feedback = document.getElementById('json-modal-feedback');
 
+    jsonModalSourceCell = sourceDiv;
     document.getElementById('json-modal-title').textContent = column;
     feedback.classList.add('hidden');
 
@@ -197,6 +211,7 @@ function openJsonModal(column, value, rowJson) {
 
 function closeJsonModal() {
     document.getElementById('json-modal').classList.add('hidden');
+    jsonModalSourceCell = null;
 }
 
 function copyJsonValue() {
@@ -226,6 +241,11 @@ function saveJsonEdit() {
             if (ok) {
                 feedback.classList.add('text-green-600');
                 feedback.textContent = 'Updated successfully.';
+                if (jsonModalSourceCell) {
+                    jsonModalSourceCell.textContent = value;
+                    jsonModalSourceCell.classList.add('bg-green-50');
+                    setTimeout(() => jsonModalSourceCell.classList.remove('bg-green-50'), 1500);
+                }
                 setTimeout(() => closeJsonModal(), 1000);
             } else {
                 feedback.classList.add('text-red-600');

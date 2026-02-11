@@ -102,13 +102,26 @@ class TableController extends Controller
         $conditions = [];
         foreach ($wheres as $wCol => $wVal) {
             $wCol = preg_replace('/[^a-zA-Z0-9_]/', '', $wCol);
-            $escaped = addslashes($wVal);
-            $conditions[] = "`{$wCol}` = '{$escaped}'";
+            if ($wVal === null) {
+                $conditions[] = "`{$wCol}` IS NULL";
+            } elseif (is_bool($wVal)) {
+                $conditions[] = "`{$wCol}` = " . ($wVal ? '1' : '0');
+            } elseif (is_int($wVal) || is_float($wVal)) {
+                $conditions[] = "`{$wCol}` = {$wVal}";
+            } else {
+                $escaped = addslashes((string) $wVal);
+                $conditions[] = "`{$wCol}` = '{$escaped}'";
+            }
         }
         $whereClause = implode(' AND ', $conditions);
 
-        $escaped = addslashes($value);
-        $sql = "ALTER TABLE `{$db}`.`{$tbl}` UPDATE `{$col}` = '{$escaped}' WHERE {$whereClause}";
+        if ($value === '' || $value === null) {
+            $setValue = 'NULL';
+        } else {
+            $escapedVal = addslashes($value);
+            $setValue = "'{$escapedVal}'";
+        }
+        $sql = "ALTER TABLE `{$db}`.`{$tbl}` UPDATE `{$col}` = {$setValue} WHERE {$whereClause}";
 
         $result = $ch->statement($sql);
 
