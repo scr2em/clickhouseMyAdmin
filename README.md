@@ -16,6 +16,8 @@ Built with Laravel, HTMX, and Tailwind CSS. No JavaScript frameworks. No build c
 - **Basic Auth** — Optional HTTP basic authentication to protect access
 - **Single Container** — Ships as one Docker image with PHP-FPM, Nginx, and Supervisor — nothing else to configure
 
+> **Security:** This tool gives full SQL access to your ClickHouse server. Always enable basic auth (`APP_AUTH_ENABLED=true`) and use a strong password, especially if the instance is exposed to the internet. For production, put it behind a reverse proxy with HTTPS.
+
 ## Quick Start with Docker Compose
 
 The fastest way to get running. This connects to an existing ClickHouse server on your host machine.
