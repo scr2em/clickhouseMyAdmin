@@ -298,6 +298,7 @@ class ClickHouseService
                         'data' => $json['data'] ?? [],
                         'rows' => $json['rows'] ?? 0,
                         'statistics' => $json['statistics'] ?? [],
+                        'rawJson' => $body,
                     ];
                 }
 

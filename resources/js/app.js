@@ -84,6 +84,66 @@ window.toggleSidebar = function() {
     sidebar.classList.toggle('overflow-hidden');
 };
 
+// View toggle for query results (Table / JSON)
+window.switchQueryView = function(view, btn) {
+    const tableView = document.getElementById('query-table-view');
+    const jsonView = document.getElementById('query-json-view');
+    if (!tableView || !jsonView) return;
+
+    const buttons = btn.parentElement.querySelectorAll('.query-view-btn');
+    buttons.forEach(b => {
+        b.className = 'query-view-btn px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-gray-700';
+    });
+    btn.className = 'query-view-btn px-3 py-1 text-xs font-medium rounded-md bg-white text-gray-700 shadow-sm';
+
+    if (view === 'json') {
+        tableView.classList.add('hidden');
+        jsonView.classList.remove('hidden');
+    } else {
+        jsonView.classList.add('hidden');
+        tableView.classList.remove('hidden');
+    }
+};
+
+// View toggle for table data results (Table / JSON)
+window.switchDataView = function(view, btn) {
+    const tableView = document.getElementById('data-table-view');
+    const jsonView = document.getElementById('data-json-view');
+    if (!tableView || !jsonView) return;
+
+    const buttons = btn.parentElement.querySelectorAll('.data-view-btn');
+    buttons.forEach(b => {
+        b.className = 'data-view-btn px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-gray-700';
+    });
+    btn.className = 'data-view-btn px-3 py-1 text-xs font-medium rounded-md bg-white text-gray-700 shadow-sm';
+
+    if (view === 'json') {
+        tableView.classList.add('hidden');
+        jsonView.classList.remove('hidden');
+    } else {
+        jsonView.classList.add('hidden');
+        tableView.classList.remove('hidden');
+    }
+};
+
+// Copy JSON to clipboard
+window.copyJsonToClipboard = function(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent).then(() => {
+        const btn = el.parentElement.querySelector('button');
+        if (btn) {
+            const originalTitle = btn.title;
+            btn.title = 'Copied!';
+            btn.classList.add('text-green-500');
+            setTimeout(() => {
+                btn.title = originalTitle;
+                btn.classList.remove('text-green-500');
+            }, 1500);
+        }
+    });
+};
+
 // Close modals on Escape
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
