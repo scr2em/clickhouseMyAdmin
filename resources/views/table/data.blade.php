@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 const UPDATE_URL = '{{ route("table.updateCell", [$database, $table]) }}';
+const DELETE_URL = '{{ route("table.deleteRow", [$database, $table]) }}';
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
 
 function postCellUpdate(column, value, rowJson) {
@@ -100,6 +101,40 @@ function postCellUpdate(column, value, rowJson) {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
         body: JSON.stringify({ column, value, wheres: JSON.parse(rowJson) }),
     }).then(r => r.text().then(text => ({ ok: r.ok, text })));
+}
+
+// --- Row deletion ---
+
+function deleteRow(btn, rowJson) {
+    if (!confirm('Are you sure you want to delete this row? This action cannot be undone.')) return;
+
+    const tr = btn.closest('tr');
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>';
+
+    fetch(DELETE_URL, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+        body: JSON.stringify({ wheres: JSON.parse(rowJson) }),
+    })
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        if (ok && data.success) {
+            tr.style.transition = 'opacity 0.3s, background-color 0.3s';
+            tr.style.backgroundColor = '#fef2f2';
+            tr.style.opacity = '0';
+            setTimeout(() => tr.remove(), 300);
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
+            alert(data.error || 'Delete failed.');
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
+        alert('Request failed.');
+    });
 }
 
 // --- Inline cell editing (non-JSON) ---

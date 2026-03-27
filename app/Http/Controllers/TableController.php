@@ -132,4 +132,43 @@ class TableController extends Controller
         $error = $result['error'] ?? 'Update failed.';
         return response('<div class="text-sm text-red-600">' . e($error) . '</div>', 422);
     }
+
+    public function deleteRow(string $database, string $table, Request $request, ClickHouseService $ch)
+    {
+        $wheres = $request->input('wheres', []);
+
+        if (empty($wheres)) {
+            return response()->json(['success' => false, 'error' => 'Missing row identifiers.'], 400);
+        }
+
+        $db = addslashes($database);
+        $tbl = addslashes($table);
+
+        $conditions = [];
+        foreach ($wheres as $wCol => $wVal) {
+            $wCol = preg_replace('/[^a-zA-Z0-9_]/', '', $wCol);
+            if ($wVal === null) {
+                $conditions[] = "`{$wCol}` IS NULL";
+            } elseif (is_bool($wVal)) {
+                $conditions[] = "`{$wCol}` = " . ($wVal ? '1' : '0');
+            } elseif (is_int($wVal) || is_float($wVal)) {
+                $conditions[] = "`{$wCol}` = {$wVal}";
+            } else {
+                $escaped = addslashes((string) $wVal);
+                $conditions[] = "`{$wCol}` = '{$escaped}'";
+            }
+        }
+        $whereClause = implode(' AND ', $conditions);
+
+        $sql = "ALTER TABLE `{$db}`.`{$tbl}` DELETE WHERE {$whereClause}";
+
+        $result = $ch->statement($sql);
+
+        if (!empty($result['success'])) {
+            return response()->json(['success' => true]);
+        }
+
+        $error = $result['error'] ?? 'Delete failed.';
+        return response()->json(['success' => false, 'error' => $error], 422);
+    }
 }

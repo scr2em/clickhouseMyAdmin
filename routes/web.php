@@ -14,6 +14,7 @@ Route::get('/database/{database}', [DatabaseController::class, 'show'])->name('d
 Route::get('/database/{database}/table/{table}/structure', [TableController::class, 'structure'])->name('table.structure');
 Route::match(['get', 'post'], '/database/{database}/table/{table}/data', [TableController::class, 'data'])->name('table.data');
 Route::post('/database/{database}/table/{table}/update-cell', [TableController::class, 'updateCell'])->name('table.updateCell');
+Route::delete('/database/{database}/table/{table}/delete-row', [TableController::class, 'deleteRow'])->name('table.deleteRow');
 Route::get('/query', [QueryController::class, 'index'])->name('query.index');
 Route::post('/query', [QueryController::class, 'execute'])->name('query.execute');
 

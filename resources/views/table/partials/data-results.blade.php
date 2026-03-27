@@ -34,6 +34,9 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
+                            @if(!$isCustomQuery)
+                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-400 w-8"></th>
+                            @endif
                             @foreach($result['meta'] as $col)
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
                                     @if($isCustomQuery)
@@ -63,7 +66,18 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @forelse($result['data'] as $rowIdx => $row)
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 group/row">
+                            @if(!$isCustomQuery)
+                                <td class="px-2 py-2 text-center w-8">
+                                    <button onclick="deleteRow(this, {{ json_encode(json_encode($row)) }})"
+                                            class="opacity-0 group-hover/row:opacity-100 text-gray-400 hover:text-red-600 transition-opacity"
+                                            title="Delete row">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            @endif
                             @foreach($result['meta'] as $col)
                                 @php
                                     $v = $row[$col['name']] ?? null;
@@ -90,7 +104,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="{{ count($result['meta']) }}" class="px-4 py-6 text-center text-gray-400">No data</td>
+                            <td colspan="{{ ($isCustomQuery ? 0 : 1) + count($result['meta']) }}" class="px-4 py-6 text-center text-gray-400">No data</td>
                         </tr>
                         @endforelse
                     </tbody>
